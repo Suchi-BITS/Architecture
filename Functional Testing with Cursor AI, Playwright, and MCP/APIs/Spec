@@ -1,0 +1,103 @@
+Required APIs for MCP Server — Functional Testing Project
+1. Test Management APIs
+
+GET /tests
+Lists all available Playwright tests.
+Response: JSON list of test names, IDs, and descriptions.
+
+POST /tests
+Generates a new test from a natural language requirement.
+Request Payload: { "requirement": "<NL requirement>" }
+Response: { "test_id": "<id>", "test_code": "<Playwright code>" }
+
+GET /tests/{test_id}
+Retrieves details of a specific test.
+Response: { "test_id": "<id>", "test_code": "<code>", "description": "<desc>" }
+
+DELETE /tests/{test_id}
+Deletes a specific test.
+Response: { "status": "deleted" }
+
+2. Test Execution APIs
+
+POST /tests/{test_id}/run
+Runs a specific test.
+Request Payload: { "test_id": "<id>", "browser": "chromium|firefox|webkit" }
+Response: { "run_id": "<id>", "status": "running" }
+
+GET /runs/{run_id}
+Gets the status and results of a test run.
+Response: { "run_id": "<id>", "status": "completed|failed|running", "results": {...}, "artifacts": [...] }
+
+POST /tests/run/all
+Runs all tests in the suite.
+Request Payload: { "browser": "chromium|firefox|webkit" }
+Response: { "suite_run_id": "<id>", "status": "running" }
+
+3. Test Artifacts APIs
+
+GET /runs/{run_id}/artifacts
+Retrieves artifacts of a test run (screenshots, videos, logs).
+Response: { "screenshots": [...], "videos": [...], "logs": "<log text>" }
+
+GET /runs/{run_id}/artifact/{artifact_id}
+Downloads a specific artifact.
+Response: Binary file (image, video, log).
+
+4. Test Editing APIs
+
+POST /tests/{test_id}/edit
+Edits an existing test.
+Request Payload: { "test_code": "<code>" }
+Response: { "status": "updated", "test_code": "<new code>" }
+
+POST /tests/{test_id}/regenerate
+Regenerates test code from requirement.
+Request Payload: { "requirement": "<NL requirement>" }
+Response: { "test_id": "<id>", "test_code": "<Playwright code>" }
+
+5. System APIs
+
+GET /health
+Health check of MCP Server.
+Response: { "status": "ok" }
+
+GET /status
+Returns system status and browser availability.
+Response: { "browsers": { "chromium": true, "firefox": true, "webkit": true } }
+
+GET /config
+Retrieves server configuration.
+Response: { "config": {...} }
+
+POST /config
+Sets server configuration.
+Request Payload: { "key": "value" }
+Response: { "config": {...} }
+
+Example API Flow
+
+Generate a test
+
+POST /tests
+{
+  "requirement": "Verify user login with valid credentials"
+}
+
+
+Run the generated test
+
+POST /tests/<test_id>/run
+{
+  "browser": "chromium"
+}
+
+
+Check test results
+
+GET /runs/<run_id>
+
+
+Download screenshot artifact
+
+GET /runs/<run_id>/artifact/<artifact_id>
